@@ -11,13 +11,19 @@ async function fetchPosts() {
 }
 
 export function Posts() {
-//   const [currentPage, setCurrentPage] = useState(0);
+  //   const [currentPage, setCurrentPage] = useState(0);
   const [currentPage] = useState(0);
   const [selectedPost, setSelectedPost] = useState(null);
 
   // replace with useQuery
-  const { data } = useQuery('posts', fetchPosts);
-  if (!data) return <div/>;
+  const { data, isError, error, isLoading } = useQuery('posts', fetchPosts);
+  if (isLoading) return <h3>Loading!</h3>;
+  if (isError) return (
+    <>
+      <h3>Something went wrong!</h3>
+      <p>error: {error} </p>
+    </>
+  );
 
   return (
     <>
