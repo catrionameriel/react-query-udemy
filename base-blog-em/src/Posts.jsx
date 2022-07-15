@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useQuery } from 'react-query';
+import { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from 'react-query';
 import { PostDetail } from "./PostDetail";
 
 const maxPostPage = 10;
@@ -15,8 +15,21 @@ export function Posts() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedPost, setSelectedPost] = useState(null);
 
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (currentPage < maxPostPage) {
+      const nextPage = currentPage + 1;
+      queryClient.prefetchQuery(['posts', nextPage], () => fetchPosts(nextPage));
+    }
+  }, [currentPage, queryClient])
+
   // reactQuery detects when query key changes and fires request in this case currentPage
-  const { data, isError, error, isLoading } = useQuery(['posts', currentPage], () => fetchPosts(currentPage), { staleTime: 2000 });
+  const { data, isError, error, isLoading } = useQuery(
+    ['posts', currentPage],
+    () => fetchPosts(currentPage),
+    { staleTime: 2000, keepPreviousData: true },
+  );
   if (isLoading) return <h3>Loading!</h3>;
   if (isError) return (
     <>
@@ -39,7 +52,8 @@ export function Posts() {
         ))}
       </ul>
       <div className="pages">
-        {/* How does setCurrentPage function know currentPageNumber */}
+        {/* How does setCurrentPage function know currentPageNumber? */}
+        {/* Why is it better to use callback function rather than adding to currentPage? */}
         <button disabled={currentPage <= 1} onClick={() => { setCurrentPage((currentPageNumber) => currentPageNumber - 1) }}>
           Previous page
         </button>
