@@ -21,7 +21,7 @@ export function Posts() {
   if (isError) return (
     <>
       <h3>Something went wrong!</h3>
-      <p>error: {error} </p>
+      <p>{error.toString()}</p>
     </>
   );
 
